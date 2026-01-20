@@ -3,11 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Web Explorer | Pure Random & Adaptive Modes</title>
+    <title>Random Web Explorer | Discover Random Websites</title>
     <meta name="description" content="Discover random websites across the internet. Pure Random and Adaptive modes with intelligent learning algorithms. Find hidden gems online.">
-    <meta name="keywords" content="random website, domain finder, web explorer, internet discovery, random link">
+    <meta name="keywords" content="random website, domain finder, web explorer, internet discovery, random link, find random sites">
+    <meta name="author" content="Random Web Explorer">
+    <link rel="canonical" href="https://randomwe.lat">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* ===== NAVBAR ESTILO MODERNO ===== */
+        .navbar {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 15px;
+            padding: 15px 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e1e5e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #135078;
+            text-decoration: none;
+        }
+        
+        .nav-brand i {
+            font-size: 1.8rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: #5d6d7e;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-link:hover {
+            background: #f8f9fa;
+            color: #135078;
+        }
+        
+        .nav-link.donate {
+            background: linear-gradient(to right, #FF6B6B, #FF8E53);
+            color: white;
+            padding: 8px 20px;
+        }
+        
+        .nav-link.donate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #135078;
+            cursor: pointer;
+        }
+        
         /* ===== ESTILO COMPACTO ORIGINAL MEJORADO ===== */
         * { 
             margin: 0; 
@@ -26,14 +102,14 @@
         }
         
         .container {
-            max-width: 850px;
+            max-width: 900px;
             width: 100%;
             background: white;
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             border: 1px solid #e1e5e9;
-            margin-top: 20px;
+            margin-top: 10px;
         }
         
         header { 
@@ -50,7 +126,7 @@
         .tagline {
             font-size: 1.1rem;
             color: #7f8c8d;
-            max-width: 600px;
+            max-width: 900px;
             margin: 0 auto 25px;
             line-height: 1.5;
         }
@@ -71,10 +147,10 @@
         }
         
         .mode-btn {
-            padding: 10px 20px;
-            border: 2px solid #3498db;
+            padding: 10px 30px;
+            border: 2px solid #135078;
             background: white;
-            color: #3498db;
+            color: #135078;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
@@ -89,7 +165,7 @@
         }
         
         .mode-btn.active {
-            background: #3498db;
+            background: #135078;
             color: white;
         }
         
@@ -115,10 +191,10 @@
         }
         
         .minimum-option {
-            padding: 6px 12px;
-            border: 1px solid #3498db;
+            padding: 6px 20px;
+            border: 1px solid #135078;
             background: white;
-            color: #3498db;
+            color: #135078;
             border-radius: 5px;
             font-size: 0.9rem;
             font-weight: 600;
@@ -131,7 +207,7 @@
         }
         
         .minimum-option.active {
-            background: #3498db;
+            background: #135078;
             color: white;
         }
         
@@ -231,11 +307,11 @@
             justify-content: center;
             gap: 10px;
             transition: all 0.2s;
-            min-width: 180px;
+            min-width: 250px;
         }
         
         .btn-primary {
-            background: #2ecc71;
+            background: #1E874A;
             color: white;
         }
         
@@ -246,7 +322,7 @@
         }
         
         .btn-secondary {
-            background: #e74c3c;
+            background: #BF3B2E;
             color: white;
         }
         
@@ -255,7 +331,7 @@
         }
         
         .btn-success {
-            background: #3498db;
+            background: #135078;
             color: white;
         }
         
@@ -275,7 +351,7 @@
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
-            border-left: 5px solid #3498db;
+            border-left: 5px solid #135078;
             transition: all 0.3s;
         }
         
@@ -285,12 +361,12 @@
         }
         
         .status-found {
-            border-left-color: #2ecc71;
+            border-left-color: #1E874A;
             background-color: #e8f6f3;
         }
         
         .status-notfound {
-            border-left-color: #e74c3c;
+            border-left-color: #BF3B2E;
             background-color: #fdedec;
         }
         
@@ -329,7 +405,7 @@
             border-radius: 12px;
             padding: 25px;
             text-align: center;
-            border: 2px solid #2ecc71;
+            border: 2px solid #1E874A;
             display: none;
             animation: fadeIn 0.5s;
         }
@@ -371,11 +447,34 @@
             text-decoration: underline;
         }
         
+        /* ===== ADSENSE ADS ===== */
+        .ad-container {
+            width: 100%;
+            text-align: center;
+            margin: 25px 0;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px dashed #bdc3c7;
+        }
+        
+        .ad-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
         /* ===== FOOTER INFORMATIVO ===== */
         .info-footer {
             margin-top: 40px;
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             background: white;
             border-radius: 15px;
             padding: 30px;
@@ -396,7 +495,7 @@
             color: #2c3e50;
             margin-bottom: 15px;
             padding-bottom: 8px;
-            border-bottom: 2px solid #3498db;
+            border-bottom: 2px solid #135078;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -422,25 +521,8 @@
         }
         
         .info-list li i {
-            color: #3498db;
+            color: #135078;
             margin-top: 3px;
-        }
-        
-        /* ===== ADS PLACEHOLDERS ===== */
-        .ad-placeholder {
-            width: 100%;
-            background: linear-gradient(to right, #f8f9fa, #e9ecef);
-            border: 2px dashed #bdc3c7;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            color: #7f8c8d;
-            font-size: 0.9rem;
-            margin: 20px 0;
-            min-height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         
         /* ===== FOOTER SIMPLE ===== */
@@ -452,7 +534,7 @@
             padding-top: 20px;
             border-top: 1px solid #e1e5e9;
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
         }
         
         /* ===== ANIMACIONES ===== */
@@ -482,9 +564,39 @@
         
         /* ===== RESPONSIVE MEJORADO ===== */
         @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                width: 100%;
+                display: none;
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .nav-link {
+                width: 100%;
+                justify-content: center;
+                padding: 12px;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+                position: absolute;
+                right: 25px;
+                top: 20px;
+            }
+            
             .container { 
                 padding: 15px; 
                 border-radius: 15px;
+                margin-top: 0;
             }
             
             h1 { 
@@ -563,15 +675,52 @@
             .btn {
                 padding: 14px;
                 font-size: 1rem;
+                min-width: auto;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <div class="nav-links" id="navLinks">
+            <a href="#introduction" class="nav-link">
+                <i class="fas fa-info-circle"></i> Introduction
+            </a>
+            <a href="#how-it-works" class="nav-link">
+                <i class="fas fa-cogs"></i> How It Works
+            </a>
+            <a href="#faq" class="nav-link">
+                <i class="fas fa-question-circle"></i> FAQ
+            </a>
+            <a href="privacy.html" class="nav-link">
+                <i class="fas fa-shield-alt"></i> Privacy
+            </a>
+            <a href="terms.html" class="nav-link">
+                <i class="fas fa-file-contract"></i> Terms
+            </a>
+            <a href="https://paypal.me/MiguelSaucedo726" target="_blank" class="nav-link donate">
+                <i class="fas fa-heart"></i> Donate
+            </a>
+        </div>
+    </nav>
+
     <div class="container">
-        <header>
-            <h1><i class="fas fa-globe-americas"></i> Random Web Explorer</h1>
-            <p class="tagline">Discover hidden corners of the internet. Two modes: Pure Random (simple) and Adaptive (intelligent learning).</p>
+        <header>       
+            <!-- <div class="ad-container">
+                <div>
+                    <div class="ad-label">Advertisement</div>
+                    Aquí iría el código de Adsense 
+                    <div style="color: #95a5a6; font-size: 0.9rem;">Ad placeholder - Adsense enabled</div>
+                </div>
+            </div> -->
+
+            <h1>Discover Random Websites</h1>
+            <p class="tagline">Explore the hidden corners of the internet. Use Pure Random mode for unpredictability or Adaptive mode for intelligent discovery.</p>
         </header>
         
         <!-- Selector de modo y mínimo -->
@@ -630,11 +779,6 @@
             </div>
         </div>
         
-        <!-- Placeholder para Ads 
-        <div class="ad-placeholder">
-            Advertisement Space (For Adsense/Affiliate)
-        </div>-->
-        
         <!-- Controles -->
         <div class="control-panel">
             <button class="btn btn-primary" onclick="startSearch()" id="startBtn">
@@ -667,51 +811,119 @@
             <p>Click the button above to open it in a new tab, or copy the URL.</p>
         </div>
         
-        <!-- Placeholder para Ads 
-        <div class="ad-placeholder">
-            Advertisement Space (For Adsense/Affiliate)
+        <!-- AdSense Ad Bottom 
+        <div class="ad-container">
+            <div>
+                <div class="ad-label">Advertisement</div>
+                
+                <div style="color: #95a5a6; font-size: 0.9rem;">Ad placeholder - Adsense enabled</div>
+            </div>
         </div>-->
     </div>
     
     <!-- Footer Informativo -->
     <div class="info-footer">
-        <div class="info-section">
-            <h3><i class="fas fa-info-circle"></i> Introduction</h3>
-            <p>Random Web Explorer is a tool that discovers random websites across the internet. It generates random domain names and verifies if they exist using intelligent algorithms.</p>
-            <p>Perfect for web explorers, developers, and curious minds who want to discover the hidden corners of the internet.</p>
-        </div>
-        
-        <div class="info-section">
-            <h3><i class="fas fa-cogs"></i> How It Works</h3>
-            <ul class="info-list">
-                <li><i class="fas fa-random"></i> <strong>Pure Random Mode:</strong> Generates completely random domain names with 2-12 characters. Simple, unpredictable, and fun.</li>
-                <li><i class="fas fa-brain"></i> <strong>Adaptive Mode:</strong> Uses machine learning to improve success rates. Learns which patterns (CV or VC families) work best for different length ranges.</li>
-                <li><i class="fas fa-check-circle"></i> <strong>Verification:</strong> Checks each domain by attempting to load its favicon. If the favicon loads, the site exists and is working.</li>
-                <li><i class="fas fa-save"></i> <strong>Persistent Learning:</strong> Your progress and adaptive learning are saved in your browser using localStorage.</li>
-            </ul>
-        </div>
-        
-        <div class="info-section">
-            <h3><i class="fas fa-question-circle"></i> FAQ</h3>
-            <ul class="info-list">
-                <li><i class="fas fa-question"></i> <strong>Is this legal?</strong> Yes, we're only checking if websites exist, not hacking or accessing restricted content.</li>
-                <li><i class="fas fa-question"></i> <strong>How long does it take to find a site?</strong> Typically 10-100 attempts, but it varies based on mode and minimum length settings.</li>
-                <li><i class="fas fa-question"></i> <strong>Can I use the found websites?</strong> Yes, all found websites are publicly accessible. Use normal caution when browsing unknown sites.</li>
-                <li><i class="fas fa-question"></i> <strong>Does it work on mobile?</strong> Yes, fully responsive design works on all devices.</li>
-                <li><i class="fas fa-question"></i> <strong>Is my data saved?</strong> Only in your browser (localStorage). No data is sent to any server.</li>
-            </ul>
-        </div>
-    </div>
-    
-    <!-- Footer Simple -->
-    <footer class="simple-footer">
-        <p>Random Web Explorer v6.0 | Pure Random & Adaptive Modes | Persistent Learning | Mobile Optimized</p>
-        <p style="margin-top: 8px; font-size: 0.8rem; color: #95a5a6;">
-            © 2024 Random Web Explorer | All discoveries are random and publicly accessible websites.
+
+      <div class="info-section" id="introduction">
+        <h3><i class="fas fa-info-circle"></i> What is Random Web Explorer?</h3>
+        <p>
+          Random Web Explorer is an experimental web tool designed to discover random, publicly accessible websites
+          across the internet. It generates domain names automatically and checks whether they exist in real time.
         </p>
+        <p>
+          The goal is exploration, curiosity, and digital discovery — revealing websites that are rarely found
+          through traditional search engines.
+        </p>
+      </div>
+
+      <div class="info-section" id="how-it-works">
+        <h3><i class="fas fa-cogs"></i> How It Works</h3>
+        <ul class="info-list">
+          <li><i class="fas fa-dice"></i> <strong>Pure Random Mode:</strong> Generates fully random domain names (2–12 characters).</li>
+          <li><i class="fas fa-brain"></i> <strong>Adaptive Mode:</strong> Learns which character patterns are more likely to exist.</li>
+          <li><i class="fas fa-globe"></i> <strong>Live Verification:</strong> Tests domains by checking public resources like favicons.</li>
+          <li><i class="fas fa-user-shield"></i> <strong>No Tracking:</strong> No accounts, no cookies, no servers collecting data.</li>
+        </ul>
+      </div>
+
+      <div class="info-section" id="faq">
+        <h3><i class="fas fa-question-circle"></i> Frequently Asked Questions</h3>
+        <ul class="info-list">
+          <li><i class="fas fa-check"></i> <strong>Is this safe?</strong> Yes. Only publicly available websites are checked.</li>
+          <li><i class="fas fa-scale-balanced"></i> <strong>Is this legal?</strong> Yes. No hacking, scraping, or restricted access.</li>
+          <li><i class="fas fa-clock"></i> <strong>How fast is it?</strong> Dozens of attempts per second, depending on your device.</li>
+          <li><i class="fas fa-mobile-alt"></i> <strong>Mobile friendly?</strong> Fully responsive on all devices.</li>
+          <li><i class="fas fa-database"></i> <strong>Is data stored?</strong> Only locally in your browser (localStorage).</li>
+        </ul>
+      </div>
+
+      <div class="info-section">
+        <h3><i class="fas fa-handshake"></i> Support & Transparency</h3>
+        <p>
+          Random Web Explorer is an independent, experimental project. It does not host, control, or endorse
+          any external websites that may be discovered.
+        </p>
+        <ul class="info-list">
+          <li><i class="fas fa-heart"></i> <strong>Donate:</strong> <a href="https://paypal.me/MiguelSaucedo726" target="_blank">Support development</a></li>
+          <li><i class="fas fa-share"></i> <strong>Share:</strong> Help others discover the project</li>
+          <li><i class="fas fa-envelope"></i> <strong>Contact:</strong>  info.randomwe@gmail.com </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Footer Legal -->
+    <footer class="simple-footer">
+      <p>
+        © Random Web Explorer · Experimental Web Discovery Tool
+      </p>
+      <p style="margin-top: 8px; font-size: 0.8rem;">
+        <a href="privacy.html">Privacy Policy</a> ·
+        <a href="terms.html">Terms of Service</a>
+      </p>
+      <p style="margin-top: 6px; font-size: 0.75rem; color: #95a5a6;">
+        This website does not guarantee the safety, content, or availability of external websites.
+        Users visit discovered sites at their own discretion.
+      </p>
     </footer>
 
+
     <script>
+        // ========== NAVBAR MOBILE FUNCTIONALITY ==========
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navLinks = document.getElementById('navLinks');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            mobileMenuBtn.innerHTML = navLinks.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                if(this.getAttribute('href') === '#') return;
+                
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if(targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    if(window.innerWidth <= 768) {
+                        navLinks.classList.remove('active');
+                        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                    }
+                }
+            });
+        });
+
         // ========== CONFIGURACIÓN ÓPTIMA ==========
         const CONFIG = {
             MAX_CHARS: 12,
@@ -804,11 +1016,6 @@
                 }
             }
             return false;
-        }
-        
-        function clearLocalStorage() {
-            localStorage.removeItem(STORAGE_KEY);
-            console.log('🧹 LocalStorage cleared');
         }
 
         // ========== ELEMENTOS DOM ==========
@@ -1270,7 +1477,7 @@
             // Auto-save cada 30 segundos
             setInterval(saveToLocalStorage, 30000);
             
-            console.log('🚀 Random Web Explorer v6.0 initialized');
+            console.log('🚀 Random Web Explorer v7.0 initialized');
             console.log('💾 localStorage:', loaded ? 'Data loaded' : 'No saved data');
             console.log('⚡ Speed:', Math.round(1000/CONFIG.DELAY_BETWEEN_CHECKS), 'attempts/sec');
             console.log('🎯 Modes: Pure Random & Adaptive (range-specific learning)');
