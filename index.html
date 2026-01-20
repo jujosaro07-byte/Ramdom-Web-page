@@ -955,6 +955,7 @@
         // Smooth scrolling mejorado
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
+                    if (!navLinks.classList.contains('active')) return;
                 if(this.getAttribute('href') === '#') return;
                 
                 e.preventDefault();
@@ -1928,3 +1929,4 @@
     </script>
 </body>
 </html>
+
