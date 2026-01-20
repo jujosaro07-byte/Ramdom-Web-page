@@ -74,15 +74,85 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
         }
-        
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #135078;
-            cursor: pointer;
+        /* Estilos móviles */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 15px;
+        position: relative;
+        flex-wrap: nowrap; /* Evita que se rompa */
+    }
+    
+    .mobile-menu-btn {
+        display: block;
+        order: 2; /* Lo coloca a la derecha */
+        z-index: 1001;
+    }
+    
+    .nav-brand {
+        order: 1; /* Logo a la izquierda */
+        flex: 1;
+    }
+    
+    .nav-links {
+        display: none; /* Oculto por defecto en móvil */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: white;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 25px;
+        z-index: 1000;
+        padding: 80px 20px 40px;
+        overflow-y: auto;
+    }
+    
+    .nav-links.active {
+        display: flex;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .nav-link {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+        padding: 15px;
+        font-size: 1.1rem;
+        border-radius: 10px;
+    }
+    
+    .nav-link.donate {
+        margin-top: 20px;
+        padding: 15px 25px;
+    }
+    
+    /* Animación */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
         }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
+
+/* Estilos para tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .nav-links {
+        gap: 15px;
+    }
+    
+    .nav-link {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+}
 
         
         /* ===== ESTILO COMPACTO ORIGINAL MEJORADO ===== */
@@ -683,33 +753,38 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar">
-        <button class="mobile-menu-btn" id="mobileMenuBtn">
-            <i class="fas fa-bars"></i>
-        </button>
-        
-        <div class="nav-links" id="navLinks">
-            <a href="#introduction" class="nav-link">
-                <i class="fas fa-info-circle"></i> Introduction
-            </a>
-            <a href="#how-it-works" class="nav-link">
-                <i class="fas fa-cogs"></i> How It Works
-            </a>
-            <a href="#faq" class="nav-link">
-                <i class="fas fa-question-circle"></i> FAQ
-            </a>
-            <a href="privacy.html" class="nav-link">
-                <i class="fas fa-shield-alt"></i> Privacy
-            </a>
-            <a href="terms.html" class="nav-link">
-                <i class="fas fa-file-contract"></i> Terms
-            </a>
-            <a href="https://paypal.me/MiguelSaucedo726" target="_blank" class="nav-link donate">
-                <i class="fas fa-heart"></i> Donate
-            </a>
-        </div>
-    </nav>
-
+<nav class="navbar">
+    <a href="#" class="nav-brand">
+        <i class="fas fa-home"></i>
+        <span>TuLogo</span>
+    </a>
+    
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <div class="nav-links" id="navLinks">
+        <a href="#introduction" class="nav-link">
+            <i class="fas fa-info-circle"></i> Introduction
+        </a>
+        <a href="#how-it-works" class="nav-link">
+            <i class="fas fa-cogs"></i> How It Works
+        </a>
+        <a href="#faq" class="nav-link">
+            <i class="fas fa-question-circle"></i> FAQ
+        </a>
+        <a href="privacy.html" class="nav-link">
+            <i class="fas fa-shield-alt"></i> Privacy
+        </a>
+        <a href="terms.html" class="nav-link">
+            <i class="fas fa-file-contract"></i> Terms
+        </a>
+        <a href="https://paypal.me/MiguelSaucedo726" target="_blank" class="nav-link donate">
+            <i class="fas fa-heart"></i> Donate
+        </a>
+    </div>
+</nav>
+    
     <div class="container">
         <header>       
             <!-- <div class="ad-container">
@@ -893,40 +968,97 @@
 
 
     <script>
-               // ========== NAVBAR MOBILE FUNCTIONALITY MEJORADO ==========
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const navLinks = document.getElementById('navLinks');
+        
+        // NAVBAR MOBILE FUNCTIONALITY
+const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const navLinks = document.getElementById('navLinks');
 
-        function toggleMobileMenu() {
-            navLinks.classList.toggle('active');
-            const isActive = navLinks.classList.contains('active');
-            
-            // Cambiar ícono
-            mobileMenuBtn.innerHTML = isActive 
-                ? '<i class="fas fa-times"></i>' 
-                : '<i class="fas fa-bars"></i>';
-            
-            // Prevenir scroll cuando el menú está abierto
-            document.body.style.overflow = isActive ? 'hidden' : '';
-            
-            // Animar el botón
-            mobileMenuBtn.style.transform = isActive ? 'rotate(90deg)' : 'rotate(0)';
-            mobileMenuBtn.style.transition = 'transform 0.3s ease';
+function toggleMobileMenu() {
+    navLinks.classList.toggle('active');
+    const isActive = navLinks.classList.contains('active');
+    
+    // Cambiar ícono
+    mobileMenuBtn.innerHTML = isActive 
+        ? '<i class="fas fa-times"></i>' 
+        : '<i class="fas fa-bars"></i>';
+    
+    // Prevenir scroll cuando el menú está abierto
+    document.body.style.overflow = isActive ? 'hidden' : '';
+    
+    // Animar el botón
+    mobileMenuBtn.style.transform = isActive ? 'rotate(90deg)' : 'rotate(0)';
+    mobileMenuBtn.style.transition = 'transform 0.3s ease';
+}
+
+// Event listener para el botón
+mobileMenuBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    toggleMobileMenu();
+});
+
+// Cerrar menú al hacer clic en un enlace
+document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+            navLinks.classList.remove('active');
+            mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            document.body.style.overflow = '';
+            mobileMenuBtn.style.transform = 'rotate(0)';
         }
+    });
+});
 
-        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+// Cerrar menú al hacer clic fuera
+document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 768) {
+        const isClickInsideNavLinks = navLinks.contains(e.target);
+        const isClickOnMenuButton = mobileMenuBtn.contains(e.target);
+        
+        if (!isClickInsideNavLinks && !isClickOnMenuButton && navLinks.classList.contains('active')) {
+            navLinks.classList.remove('active');
+            mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            document.body.style.overflow = '';
+            mobileMenuBtn.style.transform = 'rotate(0)';
+        }
+    }
+});
 
-        // Cerrar menú al hacer clic en un enlace
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    navLinks.classList.remove('active');
-                    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
-                    document.body.style.overflow = '';
-                    mobileMenuBtn.style.transform = 'rotate(0)';
-                }
+// Cerrar menú al cambiar tamaño de ventana
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+        navLinks.classList.remove('active');
+        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+        document.body.style.overflow = '';
+        mobileMenuBtn.style.transform = 'rotate(0)';
+    }
+});
+
+// Smooth scrolling (opcional si tienes enlaces internos)
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        if(this.getAttribute('href') === '#') return;
+        
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        
+        if(targetElement) {
+            // Cerrar menú móvil si está abierto
+            if(window.innerWidth <= 768) {
+                navLinks.classList.remove('active');
+                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                document.body.style.overflow = '';
+                mobileMenuBtn.style.transform = 'rotate(0)';
+            }
+            
+            // Scroll suave
+            window.scrollTo({
+                top: targetElement.offsetTop - 80,
+                behavior: 'smooth'
             });
-        });
+        }
+    });
+});
 
         // Cerrar menú al hacer clic fuera
         document.addEventListener('click', (e) => {
@@ -1929,6 +2061,7 @@
     </script>
 </body>
 </html>
+
 
 
 
