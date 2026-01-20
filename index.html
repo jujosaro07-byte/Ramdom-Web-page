@@ -776,9 +776,11 @@
                 <div class="adaptive-label">Best Pattern</div>
                 <div class="adaptive-value" id="bestMutation">CVCV</div>
                 <div class="range-label" id="bestPatternRange">Current range</div>
-            </div>
+            </div> 
         </div>
-        
+
+
+
         <!-- Controles -->
         <div class="control-panel">
             <button class="btn btn-primary" onclick="startSearch()" id="startBtn">
@@ -791,6 +793,7 @@
                 <i class="fas fa-external-link-alt"></i> Open Found Site
             </button>
         </div>
+
         
         <!-- Panel de estado -->
         <div class="status-container" id="statusContainer">
@@ -889,18 +892,67 @@
 
 
     <script>
-        // ========== NAVBAR MOBILE FUNCTIONALITY ==========
+               // ========== NAVBAR MOBILE FUNCTIONALITY MEJORADO ==========
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const navLinks = document.getElementById('navLinks');
-        
-        mobileMenuBtn.addEventListener('click', () => {
+
+        function toggleMobileMenu() {
             navLinks.classList.toggle('active');
-            mobileMenuBtn.innerHTML = navLinks.classList.contains('active') 
+            const isActive = navLinks.classList.contains('active');
+            
+            // Cambiar ícono
+            mobileMenuBtn.innerHTML = isActive 
                 ? '<i class="fas fa-times"></i>' 
                 : '<i class="fas fa-bars"></i>';
+            
+            // Prevenir scroll cuando el menú está abierto
+            document.body.style.overflow = isActive ? 'hidden' : '';
+            
+            // Animar el botón
+            mobileMenuBtn.style.transform = isActive ? 'rotate(90deg)' : 'rotate(0)';
+            mobileMenuBtn.style.transition = 'transform 0.3s ease';
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+
+        // Cerrar menú al hacer clic en un enlace
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    navLinks.classList.remove('active');
+                    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                    document.body.style.overflow = '';
+                    mobileMenuBtn.style.transform = 'rotate(0)';
+                }
+            });
         });
-        
-        // Smooth scrolling for anchor links
+
+        // Cerrar menú al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                const isClickInsideNavbar = e.target.closest('.navbar');
+                const isClickOnMenuButton = e.target.closest('.mobile-menu-btn');
+                
+                if (!isClickInsideNavbar && navLinks.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                    document.body.style.overflow = '';
+                    mobileMenuBtn.style.transform = 'rotate(0)';
+                }
+            }
+        });
+
+        // Cerrar menú al cambiar tamaño de ventana
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                navLinks.classList.remove('active');
+                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                document.body.style.overflow = '';
+                mobileMenuBtn.style.transform = 'rotate(0)';
+            }
+        });
+
+        // Smooth scrolling mejorado
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 if(this.getAttribute('href') === '#') return;
@@ -910,21 +962,24 @@
                 const targetElement = document.querySelector(targetId);
                 
                 if(targetElement) {
+                    // Cerrar menú móvil si está abierto
+                    if(window.innerWidth <= 768) {
+                        navLinks.classList.remove('active');
+                        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                        document.body.style.overflow = '';
+                        mobileMenuBtn.style.transform = 'rotate(0)';
+                    }
+                    
+                    // Scroll suave
                     window.scrollTo({
                         top: targetElement.offsetTop - 100,
                         behavior: 'smooth'
                     });
-                    
-                    // Close mobile menu if open
-                    if(window.innerWidth <= 768) {
-                        navLinks.classList.remove('active');
-                        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
-                    }
                 }
             });
         });
 
-        // ========== CONFIGURACIÓN ÓPTIMA ==========
+        // ========== CONFIGURACIÓN MEJORADA SIN RESET AGRESIVO ==========
         const CONFIG = {
             MAX_CHARS: 12,
             MAX_ATTEMPTS: 500,
@@ -934,10 +989,15 @@
             ADAPTIVE: {
                 FAMILIES: ['CV', 'VC'],
                 BASE_PATTERNS: { 'CV': 'CVCV', 'VC': 'VCVC' },
-                MUTATION_RATE: 0.2,
-                LEARNING_RATE: 0.05,
+                MUTATION_RATE: 0.3,
+                LEARNING_RATE: 0.15,
+                FORGET_RATE: 0.01,
                 MIN_SCORE: 0.1,
-                MAX_SCORE: 0.9
+                MAX_SCORE: 0.9,
+                EXPLORATION_RATE: 0.08,
+                PATTERN_DECAY: 0.95,
+                STAGNATION_THRESHOLD: 200,
+                CONFIDENCE_RESET: 0.3
             }
         };
 
@@ -946,7 +1006,7 @@
         const vowels = 'aeiou';
         const consonants = 'bcdfghjklmnpqrstvwxyz';
 
-        // ========== ESTADO DE LA APLICACIÓN ==========
+        // ========== ESTADO MEJORADO CON "MEMORIA A LARGO PLAZO" ==========
         let currentMode = 'pureRandom';
         let currentMinLength = 2;
         let appState = {
@@ -956,25 +1016,56 @@
             stats: {
                 totalAttempts: 0,
                 foundCount: 0,
-                currentSessionAttempts: 0
+                currentSessionAttempts: 0,
+                sessionStartTime: Date.now(),
+                currentStreak: 0,
+                bestStreak: 0
             },
-            // Estado del Adaptive Mode por rango
             adaptiveState: {
-                // Rangos: '2-4', '5-8', '9-12'
-                ranges: {
-                    '2-4': { familyScores: { 'CV': 0.5, 'VC': 0.5 }, bestMutation: 'CVCV', mutationHistory: {} },
-                    '5-8': { familyScores: { 'CV': 0.5, 'VC': 0.5 }, bestMutation: 'CVCV', mutationHistory: {} },
-                    '9-12': { familyScores: { 'CV': 0.5, 'VC': 0.5 }, bestMutation: 'CVCV', mutationHistory: {} }
+                // MEMORIA A LARGO PLAZO (persistente)
+                longTermMemory: {
+                    '2-4': { 
+                        familyScores: { 'CV': 0.5, 'VC': 0.5 }, 
+                        successfulPatterns: {},
+                        patternConfidence: {},
+                        lastUpdated: Date.now()
+                    },
+                    '5-8': { 
+                        familyScores: { 'CV': 0.5, 'VC': 0.5 }, 
+                        successfulPatterns: {},
+                        patternConfidence: {},
+                        lastUpdated: Date.now()
+                    },
+                    '9-12': { 
+                        familyScores: { 'CV': 0.5, 'VC': 0.5 }, 
+                        successfulPatterns: {},
+                        patternConfidence: {},
+                        lastUpdated: Date.now()
+                    }
                 },
-                currentRange: null,
-                currentFamily: null,
-                currentPattern: null
+                // MEMORIA A CORTO PLAZO (solo esta sesión)
+                shortTermMemory: {
+                    currentRange: null,
+                    currentFamily: null,
+                    currentPattern: null,
+                    recentFailures: 0,
+                    recentSuccesses: 0,
+                    attemptedPatterns: [],
+                    sessionPatterns: {}
+                },
+                // ESTADÍSTICAS GLOBALES
+                globalStats: {
+                    totalSuccesses: 0,
+                    totalFailures: 0,
+                    successRateByHour: {},
+                    lastDomainFound: null
+                }
             }
         };
 
         // ========== LOCALSTORAGE FUNCTIONS ==========
         const STORAGE_KEY = 'randomWebExplorerData';
-        
+
         function saveToLocalStorage() {
             const dataToSave = {
                 stats: appState.stats,
@@ -983,7 +1074,7 @@
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
         }
-        
+
         function loadFromLocalStorage() {
             const savedData = localStorage.getItem(STORAGE_KEY);
             if (savedData) {
@@ -997,15 +1088,21 @@
                     }
                     
                     // Cargar estado adaptativo
-                    if (parsed.adaptiveState && parsed.adaptiveState.ranges) {
-                        Object.keys(appState.adaptiveState.ranges).forEach(range => {
-                            if (parsed.adaptiveState.ranges[range]) {
-                                appState.adaptiveState.ranges[range] = {
-                                    ...appState.adaptiveState.ranges[range],
-                                    ...parsed.adaptiveState.ranges[range]
+                    if (parsed.adaptiveState && parsed.adaptiveState.longTermMemory) {
+                        // Cargar memoria a largo plazo
+                        Object.keys(appState.adaptiveState.longTermMemory).forEach(range => {
+                            if (parsed.adaptiveState.longTermMemory[range]) {
+                                appState.adaptiveState.longTermMemory[range] = {
+                                    ...appState.adaptiveState.longTermMemory[range],
+                                    ...parsed.adaptiveState.longTermMemory[range]
                                 };
                             }
                         });
+                        
+                        // Cargar estadísticas globales
+                        if (parsed.adaptiveState.globalStats) {
+                            appState.adaptiveState.globalStats = parsed.adaptiveState.globalStats;
+                        }
                     }
                     
                     console.log('✅ Loaded saved data from localStorage');
@@ -1048,13 +1145,13 @@
             if (length >= 5 && length <= 8) return '5-8';
             return '9-12';
         }
-        
+
         function getActiveRange() {
             if (currentMinLength >= 9) return '9-12';
             if (currentMinLength >= 5) return '5-8';
             return '2-4';
         }
-        
+
         function getRandomLength() {
             const min = currentMinLength;
             const max = CONFIG.MAX_CHARS;
@@ -1141,15 +1238,25 @@
 
         function updateAdaptiveStatsDisplay() {
             const activeRange = getActiveRange();
-            const rangeState = appState.adaptiveState.ranges[activeRange];
+            const longTerm = appState.adaptiveState.longTermMemory[activeRange];
             
-            if (rangeState) {
-                const cvScore = Math.round(rangeState.familyScores['CV'] * 100);
-                const vcScore = Math.round(rangeState.familyScores['VC'] * 100);
+            if (longTerm) {
+                const cvScore = Math.round(longTerm.familyScores['CV'] * 100);
+                const vcScore = Math.round(longTerm.familyScores['VC'] * 100);
                 
                 cvFamilyScoreEl.textContent = `${cvScore}%`;
                 vcFamilyScoreEl.textContent = `${vcScore}%`;
-                bestMutationEl.textContent = rangeState.bestMutation || 'CVCV';
+                
+                // Encontrar el mejor patrón (basado en confianza)
+                const patterns = Object.keys(longTerm.patternConfidence);
+                if (patterns.length > 0) {
+                    const bestPattern = patterns.reduce((a, b) => 
+                        longTerm.patternConfidence[a] > longTerm.patternConfidence[b] ? a : b
+                    );
+                    bestMutationEl.textContent = bestPattern || 'CVCV';
+                } else {
+                    bestMutationEl.textContent = 'CVCV';
+                }
                 
                 // Actualizar labels de rango
                 cvRangeLabel.textContent = activeRange;
@@ -1195,37 +1302,170 @@
             };
         }
 
+        // ========== FUNCIONES DE MUTACIÓN ==========
+        function applyRandomMutation(basePattern, length) {
+            const patternChars = basePattern.split('');
+            const mutationPos = Math.floor(Math.random() * Math.min(patternChars.length, length));
+            const mutationType = Math.random();
+            
+            if (mutationType < 0.33 && patternChars.length > 2) {
+                patternChars.splice(mutationPos, 1);
+            } else if (mutationType < 0.66 && patternChars.length < 6) {
+                const newChar = Math.random() < 0.5 ? 'C' : 'V';
+                patternChars.splice(mutationPos, 0, newChar);
+            } else {
+                patternChars[mutationPos] = patternChars[mutationPos] === 'C' ? 'V' : 'C';
+            }
+            
+            return patternChars.join('');
+        }
+
+        function applySmartMutation(basePattern, length, successfulPatterns) {
+            let pattern = basePattern;
+            const mutationType = Math.random();
+            
+            if (mutationType < 0.4 && pattern.length > 2) {
+                // Eliminar carácter (pero no si ese patrón ha sido exitoso)
+                const pos = Math.floor(Math.random() * pattern.length);
+                const testPattern = pattern.slice(0, pos) + pattern.slice(pos + 1);
+                if (!successfulPatterns[testPattern] || successfulPatterns[testPattern] < 2) {
+                    pattern = testPattern;
+                }
+            } else if (mutationType < 0.7 && pattern.length < 6) {
+                // Insertar carácter (basado en patrones exitosos)
+                const pos = Math.floor(Math.random() * pattern.length);
+                const newChar = Math.random() < 0.5 ? 'C' : 'V';
+                
+                // Verificar si este patrón expandido ha sido exitoso
+                const testPattern = pattern.slice(0, pos) + newChar + pattern.slice(pos);
+                if (!successfulPatterns[testPattern] || successfulPatterns[testPattern] < 2) {
+                    pattern = testPattern;
+                }
+            } else {
+                // Cambiar carácter
+                const pos = Math.floor(Math.random() * pattern.length);
+                const chars = pattern.split('');
+                chars[pos] = chars[pos] === 'C' ? 'V' : 'C';
+                pattern = chars.join('');
+            }
+            
+            return pattern;
+        }
+
+        // ========== MODO EXPLORATORIO ==========
+        function getExploratoryDomain(length, range) {
+            console.log(`🌍 Exploratory mode for range ${range}`);
+            
+            // Generar algo completamente diferente
+            let domain = '';
+            const patternTypes = ['CVCV', 'VCVC', 'CVCVC', 'VCVCV', 'CCVV', 'VVCC'];
+            const pattern = patternTypes[Math.floor(Math.random() * patternTypes.length)];
+            
+            for (let i = 0; i < length; i++) {
+                const patternIndex = i % pattern.length;
+                const charType = pattern[patternIndex];
+                
+                switch(charType) {
+                    case 'C':
+                        domain += consonants.charAt(Math.floor(Math.random() * consonants.length));
+                        break;
+                    case 'V':
+                        domain += vowels.charAt(Math.floor(Math.random() * vowels.length));
+                        break;
+                    default:
+                        domain += allChars.charAt(Math.floor(Math.random() * allChars.length));
+                }
+            }
+            
+            const tld = CONFIG.TLDs[Math.floor(Math.random() * CONFIG.TLDs.length)];
+            
+            return { 
+                domain: domain + tld, 
+                length: length,
+                method: 'Exploratory',
+                pattern: pattern,
+                family: pattern.startsWith('C') ? 'CV' : 'VC',
+                range: range
+            };
+        }
+
+        // ========== GENERADOR ADAPTATIVO MEJORADO ==========
         function getAdaptiveDomain() {
             const length = getRandomLength();
             const currentRange = getCurrentRange(length);
-            const rangeState = appState.adaptiveState.ranges[currentRange];
+            const longTerm = appState.adaptiveState.longTermMemory[currentRange];
+            const shortTerm = appState.adaptiveState.shortTermMemory;
             
-            appState.adaptiveState.currentRange = currentRange;
+            // Actualizar memoria a corto plazo
+            shortTerm.currentRange = currentRange;
             
-            // Seleccionar familia basada en scores
+            // Verificar si necesitamos ajustar por estancamiento
+            if (shortTerm.recentFailures > CONFIG.ADAPTIVE.STAGNATION_THRESHOLD / 2) {
+                const shouldExplore = adjustAdaptiveForStagnation();
+                if (shouldExplore) {
+                    // Forzar exploración diversa
+                    return getExploratoryDomain(length, currentRange);
+                }
+            }
+            
+            // 1. DECIDIR FAMILIA (usando memoria a largo plazo + exploración)
             let selectedFamily;
-            const rand = Math.random();
+            const explorationChance = CONFIG.ADAPTIVE.EXPLORATION_RATE + 
+                (shortTerm.recentFailures / 100); // Más exploración si hay muchos fallos
             
-            if (rand < rangeState.familyScores['CV']) {
-                selectedFamily = 'CV';
+            if (Math.random() < explorationChance) {
+                // Exploración: elegir aleatoriamente
+                selectedFamily = Math.random() < 0.5 ? 'CV' : 'VC';
+                console.log(`🎲 Exploration mode: ${selectedFamily} family`);
             } else {
-                selectedFamily = 'VC';
+                // Explotación: usar lo aprendido
+                const cvScore = longTerm.familyScores['CV'];
+                const vcScore = longTerm.familyScores['VC'];
+                const total = cvScore + vcScore;
+                const cvProb = cvScore / total;
+                selectedFamily = Math.random() < cvProb ? 'CV' : 'VC';
             }
             
-            appState.adaptiveState.currentFamily = selectedFamily;
+            shortTerm.currentFamily = selectedFamily;
             
-            // Obtener patrón base
-            let pattern = CONFIG.ADAPTIVE.BASE_PATTERNS[selectedFamily];
-            appState.adaptiveState.currentPattern = pattern;
+            // 2. DECIDIR PATRÓN (usando patrones exitosos aprendidos)
+            let pattern;
+            const successfulPatterns = Object.keys(longTerm.successfulPatterns);
             
-            // Aplicar mutación aleatoria
-            let mutated = false;
-            if (Math.random() < CONFIG.ADAPTIVE.MUTATION_RATE && length >= 3) {
-                pattern = applyRandomMutation(pattern, length);
-                mutated = true;
+            if (successfulPatterns.length > 0 && Math.random() < 0.7) {
+                // Usar un patrón exitoso (ponderado por confianza)
+                const patternsWithConfidence = successfulPatterns.map(p => ({
+                    pattern: p,
+                    confidence: longTerm.patternConfidence[p] || 0.5,
+                    count: longTerm.successfulPatterns[p] || 1
+                }));
+                
+                // Ordenar por confianza
+                patternsWithConfidence.sort((a, b) => b.confidence - a.confidence);
+                
+                // Tomar uno de los mejores patrones
+                const topPatterns = patternsWithConfidence.slice(0, 3);
+                const selected = topPatterns[Math.floor(Math.random() * topPatterns.length)];
+                pattern = selected.pattern;
+                
+                console.log(`📐 Using learned pattern: ${pattern} (conf: ${(selected.confidence*100).toFixed(1)}%)`);
+            } else {
+                // Usar patrón base o crear uno nuevo
+                pattern = CONFIG.ADAPTIVE.BASE_PATTERNS[selectedFamily];
+                
+                // Aplicar mutación inteligente (basada en confianza)
+                const mutationRate = CONFIG.ADAPTIVE.MUTATION_RATE * 
+                    (1 - (longTerm.patternConfidence[pattern] || 0)); // Mutar más si poca confianza
+                
+                if (Math.random() < mutationRate && length >= 3) {
+                    pattern = applySmartMutation(pattern, length, longTerm.successfulPatterns);
+                    console.log(`🧬 Mutated pattern: ${pattern}`);
+                }
             }
             
-            // Generar dominio basado en patrón
+            shortTerm.currentPattern = pattern;
+            
+            // 3. GENERAR DOMINIO
             let domain = '';
             for (let i = 0; i < length; i++) {
                 const patternIndex = i % pattern.length;
@@ -1244,105 +1484,289 @@
             }
             
             const tld = CONFIG.TLDs[Math.floor(Math.random() * CONFIG.TLDs.length)];
+            
+            // Guardar en memoria a corto plazo
+            if (!shortTerm.sessionPatterns[pattern]) {
+                shortTerm.sessionPatterns[pattern] = 0;
+            }
+            shortTerm.sessionPatterns[pattern]++;
+            
             return { 
                 domain: domain + tld, 
                 length: length,
                 method: 'Adaptive',
                 pattern: pattern,
                 family: selectedFamily,
-                mutated: mutated,
                 range: currentRange
             };
-        }
-
-        function applyRandomMutation(basePattern, length) {
-            const patternChars = basePattern.split('');
-            const mutationPos = Math.floor(Math.random() * Math.min(patternChars.length, length));
-            const mutationType = Math.random();
-            
-            if (mutationType < 0.33 && patternChars.length > 2) {
-                patternChars.splice(mutationPos, 1);
-            } else if (mutationType < 0.66 && patternChars.length < 6) {
-                const newChar = Math.random() < 0.5 ? 'C' : 'V';
-                patternChars.splice(mutationPos, 0, newChar);
-            } else {
-                patternChars[mutationPos] = patternChars[mutationPos] === 'C' ? 'V' : 'C';
-            }
-            
-            return patternChars.join('');
         }
 
         // ========== MÉTODO DE VERIFICACIÓN ==========
         function testUrl(domain) {
             return new Promise((resolve) => {
-                const timeoutId = setTimeout(() => resolve(false), CONFIG.CHECK_TIMEOUT);
+                const timeoutId = setTimeout(() => {
+                    cleanup();
+                    resolve(false);
+                }, CONFIG.CHECK_TIMEOUT);
                 
                 const img = new Image();
+                
+                // Función de limpieza
+                function cleanup() {
+                    img.onload = null;
+                    img.onerror = null;
+                    img.src = '';
+                    clearTimeout(timeoutId);
+                }
+                
                 img.onload = () => { 
-                    clearTimeout(timeoutId); 
+                    cleanup();
                     resolve(true); 
                 };
+                
                 img.onerror = () => { 
-                    clearTimeout(timeoutId); 
+                    cleanup();
                     resolve(false); 
                 };
                 
+                // Forzar carga (con timestamp único para evitar cache)
                 img.src = `https://${domain}/favicon.ico?t=${Date.now()}`;
+                
+                // Timeout adicional para prevenir imágenes eternamente cargando
+                setTimeout(() => {
+                    if (img.complete === false) {
+                        cleanup();
+                        resolve(false);
+                    }
+                }, CONFIG.CHECK_TIMEOUT + 1000);
             });
         }
 
-        // ========== APRENDIZAJE ADAPTATIVO ==========
+        // ========== SISTEMA DE APRENDIZAJE MEJORADO ==========
         function updateAdaptiveLearning(success, domainResult) {
             if (!success || currentMode !== 'adaptive' || !domainResult.family || !domainResult.range) return;
             
             const config = CONFIG.ADAPTIVE;
             const family = domainResult.family;
             const range = domainResult.range;
-            const rangeState = appState.adaptiveState.ranges[range];
+            const longTerm = appState.adaptiveState.longTermMemory[range];
+            const shortTerm = appState.adaptiveState.shortTermMemory;
             
-            if (!rangeState) return;
+            if (!longTerm) return;
             
-            // Actualizar score de la familia para este rango
-            const adjustment = success ? config.LEARNING_RATE : -config.LEARNING_RATE * 0.5;
-            rangeState.familyScores[family] += adjustment;
+            // ACTUALIZAR MEMORIA A LARGO PLAZO (aprendizaje permanente)
             
-            // Mantener dentro de límites
-            rangeState.familyScores[family] = Math.max(
+            // 1. Ajustar scores de familia (aprendizaje principal)
+            const adjustment = config.LEARNING_RATE * 
+                (1 - Math.abs(longTerm.familyScores[family] - 0.7)); // Aprende más rápido si está cerca del óptimo
+            
+            longTerm.familyScores[family] += adjustment;
+            longTerm.familyScores[family] = Math.max(
                 config.MIN_SCORE,
-                Math.min(config.MAX_SCORE, rangeState.familyScores[family])
+                Math.min(config.MAX_SCORE, longTerm.familyScores[family])
             );
             
-            // Normalizar para que CV + VC = 1 en este rango
-            const total = rangeState.familyScores['CV'] + rangeState.familyScores['VC'];
-            rangeState.familyScores['CV'] /= total;
-            rangeState.familyScores['VC'] /= total;
+            // Balancear suavemente la otra familia
+            const otherFamily = family === 'CV' ? 'VC' : 'CV';
+            longTerm.familyScores[otherFamily] -= adjustment * 0.2;
+            longTerm.familyScores[otherFamily] = Math.max(
+                config.MIN_SCORE,
+                longTerm.familyScores[otherFamily]
+            );
             
-            // Si fue una mutación exitosa, trackearla
-            if (success && domainResult.mutated) {
+            // 2. Guardar patrones exitosos
+            if (domainResult.pattern && domainResult.pattern !== 'N/A') {
                 const pattern = domainResult.pattern;
-                if (!rangeState.mutationHistory[pattern]) {
-                    rangeState.mutationHistory[pattern] = 0;
-                }
-                rangeState.mutationHistory[pattern]++;
                 
-                // Actualizar mejor mutación para este rango
-                const currentBestScore = rangeState.mutationHistory[rangeState.bestMutation] || 0;
-                if (rangeState.mutationHistory[pattern] > currentBestScore) {
-                    rangeState.bestMutation = pattern;
+                if (!longTerm.successfulPatterns[pattern]) {
+                    longTerm.successfulPatterns[pattern] = 0;
+                }
+                longTerm.successfulPatterns[pattern] += 1;
+                
+                // Aumentar confianza en este patrón
+                if (!longTerm.patternConfidence[pattern]) {
+                    longTerm.patternConfidence[pattern] = 0.5;
+                }
+                longTerm.patternConfidence[pattern] = Math.min(
+                    0.95, // Máxima confianza
+                    longTerm.patternConfidence[pattern] + 0.1
+                );
+                
+                console.log(`💾 Learned pattern: ${pattern} (confidence: ${(longTerm.patternConfidence[pattern]*100).toFixed(1)}%)`);
+            }
+            
+            // 3. Actualizar timestamp
+            longTerm.lastUpdated = Date.now();
+            
+            // ACTUALIZAR MEMORIA A CORTO PLAZO
+            shortTerm.recentSuccesses++;
+            shortTerm.recentFailures = 0;
+            
+            if (domainResult.pattern) {
+                shortTerm.attemptedPatterns.push(domainResult.pattern);
+                // Mantener solo los últimos 50 patrones intentados
+                if (shortTerm.attemptedPatterns.length > 50) {
+                    shortTerm.attemptedPatterns.shift();
                 }
             }
             
-            // Actualizar display y guardar
+            // ACTUALIZAR ESTADÍSTICAS GLOBALES
+            appState.adaptiveState.globalStats.totalSuccesses++;
+            appState.adaptiveState.globalStats.lastDomainFound = domainResult.domain;
+            
+            // Guardar hora del éxito (para detectar patrones temporales)
+            const hour = new Date().getHours();
+            if (!appState.adaptiveState.globalStats.successRateByHour[hour]) {
+                appState.adaptiveState.globalStats.successRateByHour[hour] = 0;
+            }
+            appState.adaptiveState.globalStats.successRateByHour[hour]++;
+            
             updateAdaptiveStatsDisplay();
             saveToLocalStorage();
         }
 
-        // ========== BÚSQUEDA PRINCIPAL ==========
+        // ========== SISTEMA DE "OLVIDO" GRADUAL Y REAJUSTE ==========
+        function adjustAdaptiveForStagnation() {
+            const config = CONFIG.ADAPTIVE;
+            const shortTerm = appState.adaptiveState.shortTermMemory;
+            
+            // Solo ajustar si hay estancamiento real
+            if (shortTerm.recentFailures > config.STAGNATION_THRESHOLD) {
+                console.log(`⚠️ Stagnation detected: ${shortTerm.recentFailures} failures`);
+                
+                const currentRange = shortTerm.currentRange;
+                if (!currentRange) return;
+                
+                const longTerm = appState.adaptiveState.longTermMemory[currentRange];
+                if (!longTerm) return;
+                
+                // EN LUGAR DE RESETEAR: Reducir confianza en patrones recientes
+                Object.keys(longTerm.patternConfidence).forEach(pattern => {
+                    // Reducir confianza gradualmente
+                    longTerm.patternConfidence[pattern] *= config.CONFIDENCE_RESET;
+                    if (longTerm.patternConfidence[pattern] < 0.1) {
+                        delete longTerm.patternConfidence[pattern];
+                        delete longTerm.successfulPatterns[pattern];
+                    }
+                });
+                
+                // Aumentar tasa de exploración temporalmente
+                shortTerm.recentFailures = Math.floor(shortTerm.recentFailures / 2);
+                
+                // Aplicar "olvido" gradual a los scores
+                longTerm.familyScores['CV'] = 0.4 + (Math.random() * 0.2);
+                longTerm.familyScores['VC'] = 1 - longTerm.familyScores['CV'];
+                
+                console.log(`🔄 Adjusted confidence for range ${currentRange}`);
+                return true;
+            }
+            
+            return false;
+        }
+
+        // ========== ACTUALIZAR MANEJO DE FALLOS ==========
+        function handleAdaptiveFailure(domainResult) {
+            const shortTerm = appState.adaptiveState.shortTermMemory;
+            const range = domainResult.range;
+            
+            if (!range) return;
+            
+            // Actualizar contador de fallos recientes
+            shortTerm.recentFailures++;
+            shortTerm.recentSuccesses = 0;
+            
+            // OLVIDO GRADUAL (no reset)
+            const longTerm = appState.adaptiveState.longTermMemory[range];
+            if (longTerm && domainResult.pattern) {
+                // Reducir ligeramente la confianza en este patrón
+                const pattern = domainResult.pattern;
+                if (longTerm.patternConfidence[pattern]) {
+                    longTerm.patternConfidence[pattern] *= CONFIG.ADAPTIVE.PATTERN_DECAY;
+                    if (longTerm.patternConfidence[pattern] < 0.1) {
+                        delete longTerm.patternConfidence[pattern];
+                        delete longTerm.successfulPatterns[pattern];
+                        console.log(`🧹 Forgot pattern: ${pattern} (confidence too low)`);
+                    }
+                }
+                
+                // Aplicar "olvido" gradual a los scores
+                longTerm.familyScores[domainResult.family] *= 0.99;
+                const otherFamily = domainResult.family === 'CV' ? 'VC' : 'CV';
+                longTerm.familyScores[otherFamily] = 1 - longTerm.familyScores[domainResult.family];
+            }
+            
+            appState.adaptiveState.globalStats.totalFailures++;
+            
+            // Auto-guardar cada 50 fallos
+            if (shortTerm.recentFailures % 50 === 0) {
+                saveToLocalStorage();
+            }
+        }
+
+        // ========== FUNCIÓN DE "SESSION RESET" (no borra memoria) ==========
+        function resetSession() {
+            console.log('🔄 Resetting session (keeping long-term memory)');
+            
+            // Solo resetear memoria a corto plazo
+            appState.adaptiveState.shortTermMemory = {
+                currentRange: null,
+                currentFamily: null,
+                currentPattern: null,
+                recentFailures: 0,
+                recentSuccesses: 0,
+                attemptedPatterns: [],
+                sessionPatterns: {}
+            };
+            
+            appState.stats.currentSessionAttempts = 0;
+            appState.stats.sessionStartTime = Date.now();
+            
+            setStatus('ready', 'Session reset', 'Long-term learning preserved, starting fresh session');
+            updateAdaptiveStatsDisplay();
+        }
+
+        // ========== FUNCIÓN PARA VER LO APRENDIDO ==========
+        function showLearningInfo() {
+            console.log('🧠 Long-term learning summary:');
+            
+            Object.keys(appState.adaptiveState.longTermMemory).forEach(range => {
+                const memory = appState.adaptiveState.longTermMemory[range];
+                console.log(`\nRange ${range}:`);
+                console.log(`  CV Score: ${(memory.familyScores.CV * 100).toFixed(1)}%`);
+                console.log(`  VC Score: ${(memory.familyScores.VC * 100).toFixed(1)}%`);
+                console.log(`  Successful patterns: ${Object.keys(memory.successfulPatterns).length}`);
+                
+                // Mostrar patrones más exitosos
+                const topPatterns = Object.entries(memory.successfulPatterns)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 3);
+                
+                if (topPatterns.length > 0) {
+                    console.log('  Top patterns:');
+                    topPatterns.forEach(([pattern, count]) => {
+                        const confidence = memory.patternConfidence[pattern] || 0;
+                        console.log(`    ${pattern}: ${count} hits (${(confidence * 100).toFixed(1)}% confidence)`);
+                    });
+                }
+            });
+            
+            // Mostrar en UI
+            const patternsCount = Object.values(appState.adaptiveState.longTermMemory)
+                .reduce((total, mem) => total + Object.keys(mem.successfulPatterns).length, 0);
+            
+            setStatus('ready', `Learning: ${patternsCount} patterns memorized`, 
+                `Check console for detailed learning information (F12)`);
+        }
+
+        // =======  === BÚSQUEDA PRINCIPAL ==========
         async function startSearch() {
             if (appState.searchActive) return;
             
             appState.searchActive = true;
             appState.stats.currentSessionAttempts = 0;
+            appState.stats.sessionStartTime = Date.now();
+            
+            // Deshabilitar controles
             startBtn.disabled = true;
             stopBtn.disabled = false;
             openBtn.disabled = true;
@@ -1424,6 +1848,9 @@
                     minLengthOptions.forEach(btn => btn.disabled = false);
                     
                     console.log(`✅ Found: ${domainResult.domain} | Mode: ${currentMode} | Range: ${domainResult.range}`);
+                } else if (currentMode === 'adaptive') {
+                    // Actualizar manejo de fallos para Adaptive
+                    handleAdaptiveFailure(domainResult);
                 }
                 // Si falla, setInterval sigue corriendo cada 50ms
                 
@@ -1449,18 +1876,31 @@
             }
         }
 
-        // ========== INICIALIZACIÓN ==========
+        // ========== INICIALIZACIÓN MEJORADA ==========
         function initializeApp() {
             // Cargar datos guardados
             const loaded = loadFromLocalStorage();
             
             // Configurar event listeners
-            pureRandomModeBtn.addEventListener('click', () => setMode('pureRandom'));
-            adaptiveModeBtn.addEventListener('click', () => setMode('adaptive'));
+            pureRandomModeBtn.addEventListener('click', () => {
+                setMode('pureRandom');
+                console.log('🎲 Switched to Pure Random mode');
+            });
+            
+            adaptiveModeBtn.addEventListener('click', () => {
+                setMode('adaptive');
+                console.log('🧠 Switched to Adaptive mode');
+                // Mostrar estado actual
+                const activeRange = getActiveRange();
+                const longTerm = appState.adaptiveState.longTermMemory[activeRange];
+                console.log(`📊 Current adaptive state for ${activeRange}:`, longTerm);
+            });
             
             minLengthOptions.forEach(option => {
                 option.addEventListener('click', () => {
-                    setMinLength(parseInt(option.dataset.min));
+                    const min = parseInt(option.dataset.min);
+                    setMinLength(min);
+                    console.log(`📏 Min length set to: ${min}`);
                 });
             });
             
@@ -1477,10 +1917,10 @@
             // Auto-save cada 30 segundos
             setInterval(saveToLocalStorage, 30000);
             
-            console.log('🚀 Random Web Explorer v7.0 initialized');
+            console.log('🚀 Random Web Explorer v8.0 initialized (Intelligent Learning)');
             console.log('💾 localStorage:', loaded ? 'Data loaded' : 'No saved data');
             console.log('⚡ Speed:', Math.round(1000/CONFIG.DELAY_BETWEEN_CHECKS), 'attempts/sec');
-            console.log('🎯 Modes: Pure Random & Adaptive (range-specific learning)');
+            console.log('🧠 Adaptive mode: Long-term memory with gradual forgetting');
         }
 
         // Iniciar aplicación
