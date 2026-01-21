@@ -893,90 +893,64 @@
 
     <script>
                // ========== NAVBAR MOBILE FUNCTIONALITY MEJORADO ==========
+            // NAVBAR MOBILE - VERSIÓN SIMPLIFICADA
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const navLinks = document.getElementById('navLinks');
 
+        // Solo funciona en móvil
         function toggleMobileMenu() {
-            navLinks.classList.toggle('active');
-            const isActive = navLinks.classList.contains('active');
-            
-            // Cambiar ícono
-            mobileMenuBtn.innerHTML = isActive 
-                ? '<i class="fas fa-times"></i>' 
-                : '<i class="fas fa-bars"></i>';
-            
-            // Prevenir scroll cuando el menú está abierto
-            document.body.style.overflow = isActive ? 'hidden' : '';
-            
-            // Animar el botón
-            mobileMenuBtn.style.transform = isActive ? 'rotate(90deg)' : 'rotate(0)';
-            mobileMenuBtn.style.transition = 'transform 0.3s ease';
+            if (window.innerWidth <= 768) {
+                navLinks.classList.toggle('active');
+                const isActive = navLinks.classList.contains('active');
+                
+                // Cambiar ícono
+                mobileMenuBtn.innerHTML = isActive 
+                    ? '<i class="fas fa-times"></i>' 
+                    : '<i class="fas fa-bars"></i>';
+                
+                // Prevenir scroll cuando el menú está abierto
+                document.body.style.overflow = isActive ? 'hidden' : '';
+            }
         }
 
-        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+        // Event listener
+        mobileMenuBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleMobileMenu();
+        });
 
-        // Cerrar menú al hacer clic en un enlace
+        // Cerrar menú al hacer clic en enlace (solo móvil)
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
+                if (window.innerWidth <= 768 && navLinks.classList.contains('active')) {
                     navLinks.classList.remove('active');
                     mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
                     document.body.style.overflow = '';
-                    mobileMenuBtn.style.transform = 'rotate(0)';
                 }
             });
         });
 
-        // Cerrar menú al hacer clic fuera
+        // Cerrar menú al hacer clic fuera (solo móvil)
         document.addEventListener('click', (e) => {
-            if (window.innerWidth <= 768) {
-                const isClickInsideNavbar = e.target.closest('.navbar');
-                const isClickOnMenuButton = e.target.closest('.mobile-menu-btn');
+            if (window.innerWidth <= 768 && navLinks.classList.contains('active')) {
+                const isClickOnNavbar = e.target.closest('.navbar');
                 
-                if (!isClickInsideNavbar && navLinks.classList.contains('active')) {
+                if (!isClickOnNavbar) {
                     navLinks.classList.remove('active');
                     mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
                     document.body.style.overflow = '';
-                    mobileMenuBtn.style.transform = 'rotate(0)';
                 }
             }
         });
 
-        // Cerrar menú al cambiar tamaño de ventana
+        // Resetear al cambiar tamaño de ventana
         window.addEventListener('resize', () => {
+            // Si cambia a desktop, resetear
             if (window.innerWidth > 768) {
                 navLinks.classList.remove('active');
                 mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
                 document.body.style.overflow = '';
-                mobileMenuBtn.style.transform = 'rotate(0)';
             }
-        });
-
-        // Smooth scrolling mejorado
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                if(this.getAttribute('href') === '#') return;
-                
-                e.preventDefault();
-                const targetId = this.getAttribute('href');
-                const targetElement = document.querySelector(targetId);
-                
-                if(targetElement) {
-                    // Cerrar menú móvil si está abierto
-                    if(window.innerWidth <= 768) {
-                        navLinks.classList.remove('active');
-                        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
-                        document.body.style.overflow = '';
-                        mobileMenuBtn.style.transform = 'rotate(0)';
-                    }
-                    
-                    // Scroll suave
-                    window.scrollTo({
-                        top: targetElement.offsetTop - 100,
-                        behavior: 'smooth'
-                    });
-                }
-            });
         });
 
         // ========== CONFIGURACIÓN MEJORADA SIN RESET AGRESIVO ==========
