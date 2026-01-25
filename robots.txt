@@ -1,10 +1,4 @@
 User-agent: *
 Allow: /
-Allow: /index.html
-Allow: /privacy.html
-Allow: /terms.html
-
-Disallow: /admin/
-Disallow: /private/
 
 Sitemap: https://randomwe.lat/sitemap.xml
