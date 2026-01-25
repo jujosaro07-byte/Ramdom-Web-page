@@ -1,0 +1,15 @@
+RewriteEngine On
+
+# 1. Redirigir HTTP a HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://randomwe.lat/$1 [R=301,L]
+
+# 2. Redirigir www a sin-www
+RewriteCond %{HTTP_HOST} ^www\.randomwe\.lat [NC]
+RewriteRule ^(.*)$ https://randomwe.lat/$1 [R=301,L]
+
+# 3. BLOQUEAR acceso a prueba.html
+<Files "prueba.html">
+    Order Allow,Deny
+    Deny from all
+</Files>
